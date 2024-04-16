@@ -1,27 +1,58 @@
 import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import { LazyPage1, LazyPage2, LazyPage3 } from "../pages/index";
+import { LazyExoticComponent } from "react";
+
+type JSXComponent = () => JSX.Element;
+
+interface Route {
+  to: string;
+  path: string;
+  Component: LazyExoticComponent<JSXComponent> | JSXComponent;
+  name: string;
+}
+
+export const routes: Route[] = [
+  {
+    to: "lazy1",
+    path: "lazy1",
+    Component: LazyPage1,
+    name: "Lazy 1",
+  },
+  {
+    to: "lazy2",
+    path: "lazy2",
+    Component: LazyPage2,
+    name: "Lazy 2",
+  },
+  {
+    to: "lazy3",
+    path: "lazy3",
+    Component: LazyPage3,
+    name: "Lazy 3",
+  },
+];
 
 export const LazyLayout = () => {
   return (
     <div>
       <h1>LazyLayout</h1>
       <ul>
-        <li>
-          <NavLink to="lazy1">LazyLayout 1</NavLink>
-        </li>
-        <li>
-          <NavLink to="lazy2">LazyLayout 2</NavLink>
-        </li>
-        <li>
-          <NavLink to="lazy3">LazyLayout 3</NavLink>
-        </li>
+        {routes.map(({ path, to, name }) => (
+          <li key={path}>
+            <NavLink
+              className={({ isActive }) => (isActive ? "nav-active" : "")}
+              to={to}
+            >
+              {name}
+            </NavLink>
+          </li>
+        ))}
       </ul>
       <Routes>
-        <Route path="lazy1" element={<LazyPage1 />} />
-        <Route path="lazy2" element={<LazyPage2 />} />
-        <Route path="lazy3" element={<LazyPage3 />} />
-
-        <Route path="*" element={<Navigate to="lazy1" replace />} />
+        {routes.map(({ path, Component }) => (
+          <Route key={path} path={path} element={<Component />} />
+        ))}
+        <Route path="*" element={<Navigate to={routes[0].to} replace />} />
       </Routes>
     </div>
   );
